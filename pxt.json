@@ -1,5 +1,5 @@
 {
-    "name": "t5",
+    "name": "lb_steg",
     "description": "",
     "dependencies": {
         "core": "*",
