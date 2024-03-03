@@ -86,6 +86,16 @@ let crown = [
     b, b, b, b, b, b, b, b,
     b, b, b, b, b, b, b, b];
 
+let stars = [
+    b, b, b, b, b, b, o, b,
+    b, b, b, b, b, o, y, r,
+    b, o, b, b, b, b, r, b,
+    o, y, r, b, b, b, b, b,
+    b, r, b, b, b, o, b, b,
+    b, b, b, b, o, y, r, b,
+    b, b, b, b, b, r, b, b,
+    b, b, b, b, b, b, b, b];
+
 let rainbow_vert = [
     r, o, y, g, lbl, bl, ind, b,
     r, o, y, g, lbl, bl, ind, b,
@@ -96,10 +106,23 @@ let rainbow_vert = [
     r, o, y, g, lbl, bl, ind, b,
     r, o, y, g, lbl, bl, ind, b];
 
+let star_steg = [
+    (0, 0, 0), b, b, b, b, b, o, b,
+    b, b, b, b, b, o, y, r,
+    b, o, b, b, b, b, r, b,
+    o, y, r, b, b, b, b, b,
+    b, r, b, b, b, o, b, b,
+    b, b, b, b, o, y, r, b,
+    b, b, b, b, b, r, b, b,
+    b, b, b, b, b, b, b, b];
+
+
 // set up arrays of images
-let imagesArr = [heart,  apple,   dinosaur,   pacman,   ghost,   crown,    rainbow_vert];
-let namesArr = ["heart", "apple", "dinosaur", "pacman", "ghost", "crown",   "rainbow"];
+let imagesArr = [heart,  apple,   dinosaur,   pacman,   ghost,   crown,  stars,  rainbow_vert];
+let namesArr = ["heart", "apple", "dinosaur", "pacman", "ghost", "crown", "stars", "rainbow"];
 let currentIndex = 0;
+let currentPixel = 0;
+
 
 // set up enumeration type (helpful as parameter to functions below)
 enum Images {
@@ -115,6 +138,8 @@ enum Images {
     Ghost,
     //% block="crown"
     Crown,
+    //% block="stars"
+    Stars,
     //% block="rainbow"
     Rainbow
 }
@@ -128,7 +153,8 @@ function findIndex(img: Images): number {
         case Images.Pacman: return 3;
         case Images.Ghost: return 4;
         case Images.Crown: return 5;
-        case Images.Rainbow: return 6;
+        case Images.Stars: return 6;
+        case Images.Rainbow: return 7;
         default: return -1;
     }
 }
@@ -144,12 +170,173 @@ function showImageIndex(imgIndex: number): void {
 
 // internal function to return array with r,g,b components from the decimal colours
 function getRGB(colour: number): number[] {
-    let r = Math.floor(colour / 256 * 256);
+    let r = Math.floor(colour / 256 / 256);
     let g = Math.floor(colour / 256) % 256;
     let b = colour % 256;
     let rgb_array = [r, g, b];
     return rgb_array;
 }
+
+// internal function to support showColour
+function showColourInt(pixel: number, red: number, green: number, blue: number): void {
+    display.setPixelColor(pixel, neopixel.colors(neopixel.rgb(red, green, blue)))
+    display.show()
+}
+
+// internal function to check if parameter is a single character
+function isLetter(s: string): boolean {
+    if (s.length === 1) {
+        return s.toLowerCase() != s.toUpperCase();
+    }
+    else
+        return false;
+}
+
+// internal recursive function to convert decimal number to binary
+// note: returned binary number always has leading zero
+// note: tried using toString with radix 2, but reported error (expected no parameter) 
+function recursiveDecBin(dec_num: number): string {
+    if (dec_num === 0)
+        // base case: return "0" if dec_num=0 
+        return "0";
+    else {
+        // first part: recursive call with integer division of dec_num by 2
+        // second part: append remainder (gives string)
+        return (recursiveDecBin(Math.floor(dec_num / 2))
+            + (dec_num % 2));
+    }
+}
+
+// internal wrapper function for recursiveDecBin
+// note: expected num is 0..63; returned str will be 6 bit binary
+function convertDecBin(dec_num: number, bits: number): string {
+    if (bits === 6) {
+        // only convert 0..63 (to give 6 bit binary). Otherwise return 0
+        if (dec_num > 63 || dec_num < 0)
+            return "000000"
+    }
+    else if (bits === 8) {
+        // only convert 0..255 (to give 8 bit binary). Otherwise return 0
+        if (dec_num > 255 || dec_num < 0)
+            return "00000000"
+    }
+
+    // dec_num is in correct range, so call to recursive function
+    let bin = recursiveDecBin(dec_num);
+
+    // ensure returned str is 6 or 8 bit binary
+    let len = bin.length;
+    if (len > bits) {
+        // get rid of leading zero from recursive function
+        return bin.slice(1);
+    }
+    else {
+        // pad with leading zeros to get 6 bit binary
+        for (let i = 0; i < bits - len; i++)
+            bin = "0" + bin;
+        return bin;
+    }
+}
+
+// internal function to switch from binary to decimal
+// note: expected num is 0..63; returned str will be 6 bit binary
+function convertBinDec(bin_num: string): number {
+    let multiplier = 1;
+    let result = 0;
+    for (let i=bin_num.length-1; i>=0; i--) {
+        if (bin_num[i] === "1")
+            result = result + multiplier;
+        multiplier = multiplier * 2;
+    }
+    return result;
+}
+
+// internal function to support writePixel
+function writePixelInt(pixel: number, img: Images, red: number, green: number, blue: number): void {
+    let imgIndex = findIndex(img);
+    imagesArr[imgIndex][pixel] = neopixel.rgb(red, green, blue);
+    display.show()
+}
+
+// internal function to support encode
+function encodeInt(letter_binary: string, img: Images, pixel: number): void {
+    // get rgb colour (as array) for given pixel of given image
+    let imgIndex = findIndex(img);
+    let colour = imagesArr[imgIndex][pixel];
+    let rgb = getRGB(colour);  // rgb is array [r, g, b]
+    let rgb_str = ["","",""];
+
+    for (let i=0; i<3; i++) {
+        rgb_str[i] = convertDecBin(rgb[i], 8);
+        rgb_str[i] = rgb_str[i].slice(0, -2); // get rid of 2 least significant bits (steganography method)
+        rgb_str[i] = rgb_str[i] + letter_binary.slice(0,2);  // replace with part of the binary letter
+        letter_binary = letter_binary.slice(2);
+        // convert binary to integer
+        rgb[i] = convertBinDec(rgb_str[i]);
+        //basic.showString(">" + rgb[i] + "<")
+    }
+
+    // finally change the given pixel on the given image
+    writePixelInt(pixel, img, rgb[0], rgb[1], rgb[2]);
+}
+
+// -- SHOW RGB COLOUR on MICRO:BIT --
+function showRGBcolour(): void {
+    let colour = imagesArr[currentIndex][currentPixel];
+    let colour_array = getRGB(colour);
+    basic.showString(currentPixel+":" + colour_array[0] + "," + colour_array[1] + "," + colour_array[2]);
+}
+
+GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Fire1, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
+    showRGBcolour();
+})
+
+
+// --- CONTROL MOVEMENT ---
+
+function tempHighlightPixel(): void {
+    // get original colour of pixel
+    let colour = imagesArr[currentIndex][currentPixel];
+    let colour_array = getRGB(colour);
+
+    // change pixel to white
+    display.setPixelColor(currentPixel, neopixel.colors(NeoPixelColors.White))
+    display.show();
+    basic.pause(100);
+
+    // change back to original colour
+    display.setPixelColor(currentPixel, neopixel.rgb(colour_array[0], colour_array[1], colour_array[2]))
+    display.show();
+}
+
+// control movement around the Zip64 display
+GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Right, GAME_ZIP64.ZIP64ButtonEvents.Click, function () { 
+    currentPixel++;
+    if (currentPixel % 8 === 0)
+        currentPixel = currentPixel - 8;
+    tempHighlightPixel();
+})
+
+GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Left, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
+    currentPixel--;
+    if (currentPixel < 0 || currentPixel % 8 === 7)
+        currentPixel = currentPixel + 8;
+    tempHighlightPixel();
+})
+
+GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Down, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
+    currentPixel = currentPixel + 8;
+    if (currentPixel > 63)
+        currentPixel = currentPixel - 64;
+    tempHighlightPixel();
+})
+
+GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Up, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
+    currentPixel = currentPixel - 8;
+    if (currentPixel < 0)
+        currentPixel = currentPixel + 64;
+        tempHighlightPixel();
+})
 
 
 /**
@@ -159,34 +346,57 @@ function getRGB(colour: number): number[] {
 //% color="#B39EF3" weight=115
 namespace cryptsteg {
 
-    // ADJUST PIXEL
+    // ENCODE STRING
     /**
-     * adjust Pixel for the given image, the specified pixel value is increased by the new rgb values
-     * - note: need to call showImage afterwards
-     * @param pixel the pixel to be changed
-     * @param img the image to be changed
-     * @param red the increment value for the red component
-     * @param green the increment value for the green component
-     * @param blue the increment value for the blue component
+     * encode the string in the given image, starting at the specified pixel value
+     * @param str the string being hidden
+     * @param img the image to be used
+     * @param pixel the pixel at which to start
      */
-    //% block="adjust pixel $pixel|$img|red $red|green $green|blue $blue"
-    //% pixel.min=0 pixel.max=63 v.defl=0
-    //% red.min=0 red.max=7 red.defl=0
-    //% green.min=0 green.max=7 green.defl=0
-    //% blue.min=0 blue.max=7 blue.defl=0
+    //% block="encode string $str in image $img || starting at pixel $pixel"
+    //% pixel.min=0 pixel.max=63 pixel.defl=0
+    //% letter.defl="a"
+    //% expandableArgumentMode="toggle"
     //% inlineInputMode=inline
-    export function adjustPixel(pixel: number, img: Images, red: number, green: number, blue: number): void {
-        let imgIndex = findIndex(img);
-        let colour = imagesArr[imgIndex][pixel];
-        let rgb = getRGB(colour);
-        
-        let r = rgb[0] + red;
-        if (r > 255) r = 255;         // ignore anything over 255
-        let g = rgb[1] + green;
-        if (g > 255) g = 255;         // ignore anything over 255
-        let b = rgb[2] + blue;
-        if (b > 255) b = 255;         // ignore anything over 255
-        imagesArr[imgIndex][pixel] = neopixel.rgb(r, g, b);
+    export function encode_str(str: string, img: Images, pixel?: number): void {
+        let num = 0;
+        let letter_binary = ""
+        for (let i=0; i< str.length; i++) {
+            // check this character is single char, get ascii and convert to 1..26 for a-z (other chars -> 0)
+            if (isLetter(str.charAt(i).toLowerCase())) {
+                num = str.charCodeAt(i) - "a".charCodeAt(0) + 1;
+                letter_binary = convertDecBin(num, 6);
+                //basic.showString(">" + letter_binary + "<")
+
+                encodeInt(letter_binary, img, pixel+i);
+            }
+            else
+                encodeInt("000000", img, pixel+i);
+        }
+    }
+
+    // ENCODE CHAR
+    /**
+     * encode Pixel for the given image, the specified pixel value is coded with the new rgb values
+     * @param letter the letter being hidden in the rgb colour
+     * @param img the image to be changed
+     * @param pixel the pixel to be changed
+     */
+    //% block="encode char $letter in image $img at pixel $pixel"
+    //% pixel.min=0 pixel.max=63 pixel.defl=0
+    //% letter.defl="a"
+    //% inlineInputMode=inline
+    export function encode_char(letter: string, img: Images, pixel: number): void {
+        // check str is single char, get ascii and convert to 1..26 for a-z (other chars -> 0)
+        if (isLetter(letter.charAt(0).toLowerCase())) {
+            let num = letter.charCodeAt(0) - "a".charCodeAt(0) + 1;
+            let letter_binary = convertDecBin(num, 6);
+            //basic.showString(">" + letter_binary + "<")
+
+            encodeInt(letter_binary, img, pixel);
+        }  
+        else
+            encodeInt("000000", img, pixel);
     }
 
     // SHOW NEXT IMAGE
@@ -221,19 +431,18 @@ namespace cryptsteg {
         display.show();
     }
 
-    // SET PIXEL
+    // SHOW COLOUR
     /**
      * set the specified pixel to the rgb colour provided 
      */
-    //% block="set pixel colour at $pixel| to red $red|green $green|blue $blue"
+    //% block="show pixel colour at $pixel| to red $red|green $green|blue $blue"
     //% pixel.min=0 pixel.max=63 v.defl=0
     //% red.min=0 red.max=255 red.defl=0
     //% green.min=0 green.max=255 green.defl=0
     //% blue.min=0 blue.max=255 blue.defl=0
     //% inlineInputMode=inline
-    export function setPixelColour(pixel: number, red: number, green: number, blue: number): void {
-        display.setPixelColor(pixel, neopixel.colors(neopixel.rgb(red, green, blue)))
-        display.show()
+    export function showColour(pixel: number, red: number, green: number, blue: number): void {
+        showColourInt(pixel, red, green, blue);
     }
 
     // Advanced functions below here ...
@@ -241,7 +450,6 @@ namespace cryptsteg {
     // WRITE PIXEL
     /**
      * writePixel for the given image, the specified pixel is overwritten with the new rgb values
-    * - note: need to call showImage afterwards
     * @param pixel the pixel to be changed
      * @param img the image to be changed
      * @param red the new value for the red component
@@ -250,14 +458,13 @@ namespace cryptsteg {
      */
     //% block="write pixel $pixel|$img|red $red|green $green|blue $blue"
     //% advanced=true
-    //% pixel.min=0 pixel.max=63 v.defl=0
+    //% pixel.min=0 pixel.max=63 pixel.defl=0
     //% red.min=0 red.max=255 red.defl=0
     //% green.min=0 green.max=255 green.defl=0
     //% blue.min=0 blue.max=255 blue.defl=0
     //% inlineInputMode=inline
     export function writePixel(pixel: number, img: Images, red: number, green: number, blue: number): void {
-        let imgIndex = findIndex(img);
-        imagesArr[imgIndex][pixel] = neopixel.rgb(red, green, blue);
+        writePixelInt(pixel, img, red, green, blue);
     }
 
     // NUMBER OF IMAGES
