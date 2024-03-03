@@ -346,57 +346,18 @@ GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Up, GAME_ZIP64.ZIP64ButtonEv
 //% color="#B39EF3" weight=115
 namespace cryptsteg {
 
-    // ENCODE STRING
+    // SHOW COLOUR
     /**
-     * encode the string in the given image, starting at the specified pixel value
-     * @param str the string being hidden
-     * @param img the image to be used
-     * @param pixel the pixel at which to start
+     * set the specified pixel to the rgb colour provided 
      */
-    //% block="encode string $str in image $img || starting at pixel $pixel"
-    //% pixel.min=0 pixel.max=63 pixel.defl=0
-    //% letter.defl="a"
-    //% expandableArgumentMode="toggle"
+    //% block="show colour red $red|green $green|blue $blue|at pixel $pixel"
+    //% pixel.min=0 pixel.max=63 v.defl=0
+    //% red.min=0 red.max=255 red.defl=0
+    //% green.min=0 green.max=255 green.defl=0
+    //% blue.min=0 blue.max=255 blue.defl=0
     //% inlineInputMode=inline
-    export function encode_str(str: string, img: Images, pixel?: number): void {
-        let num = 0;
-        let letter_binary = ""
-        for (let i=0; i< str.length; i++) {
-            // check this character is single char, get ascii and convert to 1..26 for a-z (other chars -> 0)
-            if (isLetter(str.charAt(i).toLowerCase())) {
-                num = str.charCodeAt(i) - "a".charCodeAt(0) + 1;
-                letter_binary = convertDecBin(num, 6);
-                //basic.showString(">" + letter_binary + "<")
-
-                encodeInt(letter_binary, img, pixel+i);
-            }
-            else
-                encodeInt("000000", img, pixel+i);
-        }
-    }
-
-    // ENCODE CHAR
-    /**
-     * encode Pixel for the given image, the specified pixel value is coded with the new rgb values
-     * @param letter the letter being hidden in the rgb colour
-     * @param img the image to be changed
-     * @param pixel the pixel to be changed
-     */
-    //% block="encode char $letter in image $img at pixel $pixel"
-    //% pixel.min=0 pixel.max=63 pixel.defl=0
-    //% letter.defl="a"
-    //% inlineInputMode=inline
-    export function encode_char(letter: string, img: Images, pixel: number): void {
-        // check str is single char, get ascii and convert to 1..26 for a-z (other chars -> 0)
-        if (isLetter(letter.charAt(0).toLowerCase())) {
-            let num = letter.charCodeAt(0) - "a".charCodeAt(0) + 1;
-            let letter_binary = convertDecBin(num, 6);
-            //basic.showString(">" + letter_binary + "<")
-
-            encodeInt(letter_binary, img, pixel);
-        }  
-        else
-            encodeInt("000000", img, pixel);
+    export function showColour(pixel: number, red: number, green: number, blue: number): void {
+        showColourInt(pixel, red, green, blue);
     }
 
     // SHOW NEXT IMAGE
@@ -431,41 +392,7 @@ namespace cryptsteg {
         display.show();
     }
 
-    // SHOW COLOUR
-    /**
-     * set the specified pixel to the rgb colour provided 
-     */
-    //% block="show pixel colour at $pixel| to red $red|green $green|blue $blue"
-    //% pixel.min=0 pixel.max=63 v.defl=0
-    //% red.min=0 red.max=255 red.defl=0
-    //% green.min=0 green.max=255 green.defl=0
-    //% blue.min=0 blue.max=255 blue.defl=0
-    //% inlineInputMode=inline
-    export function showColour(pixel: number, red: number, green: number, blue: number): void {
-        showColourInt(pixel, red, green, blue);
-    }
-
     // Advanced functions below here ...
-
-    // WRITE PIXEL
-    /**
-     * writePixel for the given image, the specified pixel is overwritten with the new rgb values
-    * @param pixel the pixel to be changed
-     * @param img the image to be changed
-     * @param red the new value for the red component
-     * @param green the new value for the green component
-     * @param blue the new value for the blue component
-     */
-    //% block="write pixel $pixel|$img|red $red|green $green|blue $blue"
-    //% advanced=true
-    //% pixel.min=0 pixel.max=63 pixel.defl=0
-    //% red.min=0 red.max=255 red.defl=0
-    //% green.min=0 green.max=255 green.defl=0
-    //% blue.min=0 blue.max=255 blue.defl=0
-    //% inlineInputMode=inline
-    export function writePixel(pixel: number, img: Images, red: number, green: number, blue: number): void {
-        writePixelInt(pixel, img, red, green, blue);
-    }
 
     // NUMBER OF IMAGES
     /**
@@ -489,5 +416,80 @@ namespace cryptsteg {
         showImageIndex(i);
     }
 
+   // WRITE PIXEL
+    /**
+     * writePixel for the given image, the specified pixel is overwritten with the new rgb values
+    * @param pixel the pixel to be changed
+     * @param img the image to be changed
+     * @param red the new value for the red component
+     * @param green the new value for the green component
+     * @param blue the new value for the blue component
+     */
+    //% block="change colour red $red|green $green|blue $blue|on image $img|at pixel $pixel"
+    //% advanced=true
+    //% pixel.min=0 pixel.max=63 pixel.defl=0
+    //% red.min=0 red.max=255 red.defl=0
+    //% green.min=0 green.max=255 green.defl=0
+    //% blue.min=0 blue.max=255 blue.defl=0
+    //% inlineInputMode=inline
+    export function writePixel(pixel: number, img: Images, red: number, green: number, blue: number): void {
+        writePixelInt(pixel, img, red, green, blue);
+    }
+
+
+    // ENCODE STRING
+    /**
+     * encode the string in the given image, starting at the specified pixel value
+     * @param str the string being hidden
+     * @param img the image to be used
+     * @param pixel the pixel at which to start
+     */
+    //% block="encode string $str in image $img || starting at pixel $pixel"
+    //% advanced = true
+    //% pixel.min=0 pixel.max=63 pixel.defl=0
+    //% letter.defl="a"
+    //% expandableArgumentMode="toggle"
+    //% inlineInputMode=inline
+    export function encode_str(str: string, img: Images, pixel?: number): void {
+        let num = 0;
+        let letter_binary = ""
+        for (let i = 0; i < str.length; i++) {
+            // check this character is single char, get ascii and convert to 1..26 for a-z (other chars -> 0)
+            if (isLetter(str.charAt(i).toLowerCase())) {
+                num = str.charCodeAt(i) - "a".charCodeAt(0) + 1;
+                letter_binary = convertDecBin(num, 6);
+                //basic.showString(">" + letter_binary + "<")
+
+                encodeInt(letter_binary, img, pixel + i);
+            }
+            else
+                encodeInt("000000", img, pixel + i);
+        }
+    }
+
+    // ENCODE CHAR
+    /**
+     * encode Pixel for the given image, the specified pixel value is coded with the new rgb values
+     * @param letter the letter being hidden in the rgb colour
+     * @param img the image to be changed
+     * @param pixel the pixel to be changed
+     */
+    //% block="encode char $letter in image $img at pixel $pixel"
+    //% advanced = true
+    //% pixel.min=0 pixel.max=63 pixel.defl=0
+    //% letter.defl="a"
+    //% inlineInputMode=inline
+    export function encode_char(letter: string, img: Images, pixel: number): void {
+        // check str is single char, get ascii and convert to 1..26 for a-z (other chars -> 0)
+        if (isLetter(letter.charAt(0).toLowerCase())) {
+            let num = letter.charCodeAt(0) - "a".charCodeAt(0) + 1;
+            let letter_binary = convertDecBin(num, 6);
+            //basic.showString(">" + letter_binary + "<")
+
+            encodeInt(letter_binary, img, pixel);
+        }
+        else
+            encodeInt("000000", img, pixel);
+    }
 
 }
