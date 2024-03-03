@@ -447,7 +447,7 @@ namespace cryptsteg {
     //% block="encode string $str in image $img || starting at pixel $pixel"
     //% advanced = true
     //% pixel.min=0 pixel.max=63 pixel.defl=0
-    //% letter.defl="a"
+    //% str.defl="abc"
     //% expandableArgumentMode="toggle"
     //% inlineInputMode=inline
     export function encode_str(str: string, img: Images, pixel?: number): void {
