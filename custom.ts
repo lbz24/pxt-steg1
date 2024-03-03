@@ -251,8 +251,8 @@ function convertBinDec(bin_num: string): number {
     return result;
 }
 
-// internal function to support writePixel
-function writePixelInt(pixel: number, img: Images, red: number, green: number, blue: number): void {
+// internal function to support changeColour
+function changeColourInt(red: number, green: number, blue: number, img: Images, pixel: number): void {
     let imgIndex = findIndex(img);
     imagesArr[imgIndex][pixel] = neopixel.rgb(red, green, blue);
     display.show()
@@ -277,7 +277,7 @@ function encodeInt(letter_binary: string, img: Images, pixel: number): void {
     }
 
     // finally change the given pixel on the given image
-    writePixelInt(pixel, img, rgb[0], rgb[1], rgb[2]);
+    changeColourInt(rgb[0], rgb[1], rgb[2], img, pixel);
 }
 
 // -- SHOW RGB COLOUR on MICRO:BIT --
@@ -416,14 +416,14 @@ namespace cryptsteg {
         showImageIndex(i);
     }
 
-   // WRITE PIXEL
+   // CHANGE COLOUR (write to image)
     /**
-     * writePixel for the given image, the specified pixel is overwritten with the new rgb values
-    * @param pixel the pixel to be changed
-     * @param img the image to be changed
+     * changeColour use the new rgb values for the given image and at the specified pixel
      * @param red the new value for the red component
      * @param green the new value for the green component
      * @param blue the new value for the blue component
+     * @param img the image to be changed
+     * @param pixel the pixel to be changed
      */
     //% block="change colour red $red|green $green|blue $blue|on image $img|at pixel $pixel"
     //% advanced=true
@@ -432,8 +432,8 @@ namespace cryptsteg {
     //% green.min=0 green.max=255 green.defl=0
     //% blue.min=0 blue.max=255 blue.defl=0
     //% inlineInputMode=inline
-    export function writePixel(pixel: number, img: Images, red: number, green: number, blue: number): void {
-        writePixelInt(pixel, img, red, green, blue);
+    export function changeColour(red: number, green: number, blue: number, img: Images, pixel: number): void {
+        changeColourInt(red, green, blue, img, pixel);
     }
 
 
