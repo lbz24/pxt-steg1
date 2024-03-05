@@ -6,7 +6,7 @@
 
 let num_pixels = 64;
 let display = neopixel.create(DigitalPin.P0, num_pixels, NeoPixelMode.RGB)
-let scrollSpeed = 250;
+let scrollSpeed = 180;
 
 // set up colours used in pre-defined images
 // note: make each colour divisble by 4 => least 2 significant bits of the binary will be zero
