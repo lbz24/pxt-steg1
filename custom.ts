@@ -6,6 +6,7 @@
 
 let num_pixels = 64;
 let display = neopixel.create(DigitalPin.P0, num_pixels, NeoPixelMode.RGB)
+let scrollSpeed = 250;
 
 // set up colours used in pre-defined images
 // note: make each colour divisble by 4 => least 2 significant bits of the binary will be zero
@@ -341,9 +342,23 @@ function writeColourInt(red: number, green: number, blue: number, img: Images, p
 function resetImageInt(img: Images): void {
     let imgIndex = findIndex(img);
     imagesArr[imgIndex] = dc(img, origArr);
-    basic.showIcon(IconNames.No);
+    basic.showIcon(IconNames.No);   // show x to indicate img has been reset
     basic.pause(100);
     basic.clearScreen();
+}
+
+// internal function to support resetAllImages - resetting all images to their original (unencoded) form
+function resetAllImagesInt(): void {
+    for (let i = 0; i < imagesArr.length; i++) {
+        let img = findEnum(i);
+        imagesArr[i] = dc(img, origArr);
+    }
+    for (let j=0; j<2; j++) {   // show double flash of x to indicate all reset
+        basic.showIcon(IconNames.No);
+        basic.pause(50);
+        basic.clearScreen();
+        basic.pause(50);
+    }
 }
 
 // internal function to support encode
@@ -372,8 +387,7 @@ function encodeInt(letter_binary: string, img: Images, pixel: number): void {
 function showRGBcolour(): void {
     let colour = imagesArr[currentIndex][currentPixel];
     let colour_array = getRGB(colour);
-    basic.showString(colour_array[0] + "," + colour_array[1] + "," + colour_array[2]);
-    //basic.showString(currentPixel+":" + colour_array[0] + "," + colour_array[1] + "," + colour_array[2]);
+    basic.showString(colour_array[0] + "," + colour_array[1] + "," + colour_array[2], scrollSpeed);
 }
 
 GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Fire1, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
@@ -390,7 +404,7 @@ function get2LeastSig(): void {
         let LSBs = str.slice(-2); // get 2 least significant bits
         result = result + LSBs + ",";
     }
-    basic.showString(result.slice(0,-1));
+    basic.showString(result.slice(0,-1), scrollSpeed);
 }
 
 GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Fire2, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
@@ -555,7 +569,7 @@ namespace cryptsteg {
      * @param img the image to be changed
      * @param pixel the pixel to be changed
      */
-    //% block="write colour red $red|green $green|blue $blue|on image $img|at pixel $pixel"
+    //% block="write colour red $red|green $green|blue $blue|to image $img|at pixel $pixel"
     //% advanced=true
     //% pixel.min=0 pixel.max=63 pixel.defl=0
     //% red.min=0 red.max=255 red.defl=0
@@ -565,6 +579,17 @@ namespace cryptsteg {
     export function writeColour(red: number, green: number, blue: number, img: Images, pixel: number): void {
         writeColourInt(red, green, blue, img, pixel);
         showImage(img);
+    }
+
+    // RESET ALL IMAGES
+    /**
+     * resetAllImages resets all images to their original form, e.g. to remove encoding
+     */
+    //% block
+    //% advanced = true
+    export function resetAllImages(): void {
+        resetAllImagesInt();
+        showImage(findEnum(currentIndex));
     }
 
     // RESET IMAGE
