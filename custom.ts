@@ -8,32 +8,35 @@ let num_pixels = 64;
 let display = neopixel.create(DigitalPin.P0, num_pixels, NeoPixelMode.RGB)
 
 // set up colours used in pre-defined images
-let w = neopixel.rgb(255, 255, 255);    // white
+// note: make each colour divisble by 4 => least 2 significant bits of the binary will be zero
+let w = neopixel.rgb(252, 252, 252);    // white
 let b = neopixel.rgb(0, 0, 0);          // black
 let gr = neopixel.rgb(180, 180, 180);   // grey
 let dgr = neopixel.rgb(100, 100, 100);  // dark grey
-let r = neopixel.rgb(255, 0, 0);        // red
+let lr = neopixel.rgb(40, 0, 0);        // red
+let r = neopixel.rgb(252, 0, 0);        // red
 let o = neopixel.rgb(200, 100, 0);      // orange
-let y = neopixel.rgb(255, 255, 0);      // yellow
-let g = neopixel.rgb(0, 255, 0);        // green
-let lg = neopixel.rgb(180, 255, 0);     // light green
+let y = neopixel.rgb(252, 252, 0);      // yellow
+let g = neopixel.rgb(0, 252, 0);        // green
+let lg = neopixel.rgb(180, 252, 0);     // light green
 let dg = neopixel.rgb(0, 60, 0);        // dark green
-let lbl = neopixel.rgb(50, 180, 255);   // light blue
-let bl = neopixel.rgb(0, 100, 150);     // blue
-let ind = neopixel.rgb(120, 120, 255);  // indigo
-let br = neopixel.rgb(160, 110, 10);    // brown
-let p = neopixel.rgb(255, 100, 255);    // pink
+let lbl = neopixel.rgb(52, 180, 252);   // light blue
+let bl = neopixel.rgb(0, 100, 152);     // blue
+let dbl = neopixel.rgb(0, 0, 52);       // dark blue
+let ind = neopixel.rgb(120, 120, 252);  // indigo
+let br = neopixel.rgb(160, 112, 12);    // brown
+let p = neopixel.rgb(252, 100, 252);    // pink
 let pu = neopixel.rgb(160, 32, 240);    // purple
 
 // set up pre-defined images
 let heart = [
     b, b, b, b, b, b, b, b,
-    b, r, r, b, r, r, b, b,
-    r, y, o, r, r, r, r, b,
-    r, o, r, r, r, o, r, b,
-    b, r, r, r, o, r, b, b,
-    b, b, r, r, r, b, b, b,
-    b, b, b, r, b, b, b, b,
+    b, b, r, r, b, r, r, b,
+    b, r, y, o, r, r, r, r,
+    b, r, o, r, r, r, o, r,
+    b, b, r, r, r, o, r, b,
+    b, b, b, r, r, r, b, b,
+    b, b, b, b, r, b, b, b,
     b, b, b, b, b, b, b, b];
 
 let apple = [
@@ -47,14 +50,14 @@ let apple = [
     b, b, r, r, b, r, b, b];
 
 let dinosaur = [
-    b, g, g, g, g, b, b, b,
-    g, b, g, b, g, b, b, b,
-    g, g, g, g, g, b, b, b,
-    b, b, dg, dg, g, b, b, b,
-    b, g, lg, g, g, b, b, b,
-    b, b, lg, lg, g, b, b, g,
-    b, b, lg, lg, g, g, g, b,
-    b, b, g, b, g, b, b, b];
+    b, dg, dg, dg, dg, b, b, b,
+    dg, b, dg, b, dg, b, b, b,
+    dg, dg, dg, dg, dg, b, b, b,
+    b, b, g, g, dg, b, b, b,
+    b, g, lg, g, dg, b, b, b,
+    b, b, lg, lg, dg, b, b, g,
+    b, b, lg, lg, dg, g, g, b,
+    b, b, g, b, dg, b, b, b];
 
 let pacman = [
     b, b, y, y, y, y, dgr, b,
@@ -67,14 +70,24 @@ let pacman = [
     b, b, y, y, y, y, dgr, b];
 
 let ghost = [
-    b, b, ind, ind, ind, bl, b, b,
-    b, ind, ind, ind, bl, bl, lbl, b,
+    b, b, pu, ind, ind, lbl, b, b,
+    b, pu, ind, ind, bl, bl, lbl, b,
     b, ind, ind, bl, bl, bl, bl, lbl,
-    ind, ind, b, b, bl, b, b, bl,
+    pu, ind, b, b, bl, b, b, bl,
     ind, ind, b, lbl, bl, b, lbl, bl,
     ind, ind, ind, bl, b, bl, bl, bl,
     ind, ind, ind, bl, bl, bl, bl, bl,
     ind, ind, b, bl, bl, b, bl, bl];
+
+let alien = [
+    lbl, bl, dbl, b, b, dbl, bl, lbl,
+    b, b, dbl, bl, bl, dbl, b, b,
+    b, b, bl, bl, bl, bl, b, b,
+    b, lbl, b, bl, bl, b, lbl, b,
+    b, lbl, lbl, bl, bl, lbl, lbl, b,
+    b, b, b, bl, bl, b, b, b,
+    b, dbl, dbl, b, b, dbl, dbl, b,
+    b, b, bl, b, b, bl, b, b];
 
 let crown = [
     pu, b, b, pu, b, b, b, pu,
@@ -83,7 +96,7 @@ let crown = [
     bl, bl, bl, y, bl, bl, bl, pu,
     bl, y, bl, bl, bl, y, bl, pu,
     bl, bl, bl, bl, bl, bl, bl, pu,
-    b, b, b, b, b, b, b, b,
+    dbl, dbl, dbl, dbl, dbl, dbl, dbl, pu,
     b, b, b, b, b, b, b, b];
 
 let stars = [
@@ -106,23 +119,22 @@ let rainbow_vert = [
     r, o, y, g, lbl, bl, ind, b,
     r, o, y, g, lbl, bl, ind, b];
 
-let star_steg = [
-    (0, 0, 0), b, b, b, b, b, o, b,
-    b, b, b, b, b, o, y, r,
-    b, o, b, b, b, b, r, b,
-    o, y, r, b, b, b, b, b,
-    b, r, b, b, b, o, b, b,
-    b, b, b, b, o, y, r, b,
-    b, b, b, b, b, r, b, b,
+let black = [
+    b, b, b, b, b, b, b, b,
+    b, b, b, b, b, b, b, b,
+    b, b, b, b, b, b, b, b,
+    b, b, b, b, b, b, b, b,
+    b, b, b, b, b, b, b, b,
+    b, b, b, b, b, b, b, b,
+    b, b, b, b, b, b, b, b,
     b, b, b, b, b, b, b, b];
 
 
 // set up arrays of images
-let imagesArr = [heart,  apple,   dinosaur,   pacman,   ghost,   crown,  stars,  rainbow_vert];
-let namesArr = ["heart", "apple", "dinosaur", "pacman", "ghost", "crown", "stars", "rainbow"];
+let imagesArr = [heart,  apple,   dinosaur,   pacman,   ghost,   alien, crown,  stars,  rainbow_vert, black];
+let namesArr = ["heart", "apple", "dinosaur", "pacman", "ghost", "alien", "crown", "stars", "rainbow", "black"];
 let currentIndex = 0;
 let currentPixel = 0;
-
 
 // set up enumeration type (helpful as parameter to functions below)
 enum Images {
@@ -136,15 +148,46 @@ enum Images {
     Pacman,
     //% block="ghost"
     Ghost,
+    //% block="alien"
+    Alien,
     //% block="crown"
     Crown,
     //% block="stars"
     Stars,
     //% block="rainbow"
-    Rainbow
+    Rainbow,
+    //% block="black"
+    Black
 }
 
-// internal function to get array index from the enumeration type
+// allow a deep copy (dc) of the image to be created
+// note: initially (at set up) this will be called with imagesArr
+function dc(img: Images, thisArr: number[][]): number[] {
+    let imgIndex = findIndex(img);
+    let thisImg: number[] = [];
+    // reset the colours to those from original image (deep copy)
+    for (let i = 0; i < num_pixels; i++) {
+        thisImg[i] = thisArr[imgIndex][i];
+    }
+    return thisImg;
+}
+
+// set up originals - will allow resetting, e.g. after encoding
+const heart_orig = dc(Images.Heart, imagesArr);
+const apple_orig = dc(Images.Apple, imagesArr);
+const dinosaur_orig = dc(Images.Dinosaur, imagesArr);
+const pacman_orig = dc(Images.Pacman, imagesArr);
+const ghost_orig = dc(Images.Ghost, imagesArr);
+const alien_orig = dc(Images.Alien, imagesArr);
+const crown_orig = dc(Images.Crown, imagesArr);
+const stars_orig = dc(Images.Stars, imagesArr);
+const rainbow_orig = dc(Images.Rainbow, imagesArr);
+const black_orig = dc(Images.Black, imagesArr);
+
+const origArr = [heart_orig, apple_orig, dinosaur_orig, pacman_orig, ghost_orig, alien_orig, crown_orig, stars_orig, rainbow_orig, black_orig];
+
+// internal function to find array index from the enumeration type
+// note: tried Object.values and keys but "property does not exist"
 function findIndex(img: Images): number {
     switch (img) {
         case Images.Heart: return 0;
@@ -152,12 +195,48 @@ function findIndex(img: Images): number {
         case Images.Dinosaur: return 2;
         case Images.Pacman: return 3;
         case Images.Ghost: return 4;
-        case Images.Crown: return 5;
-        case Images.Stars: return 6;
-        case Images.Rainbow: return 7;
+        case Images.Alien: return 5;
+        case Images.Crown: return 6;
+        case Images.Stars: return 7;
+        case Images.Rainbow: return 8;
+        case Images.Black: return 9;
         default: return -1;
     }
 }
+
+// internal function to find enumeration type from the index
+// note: if parameter is -1 return the current image as default
+function findEnum(index: number): Images {
+    if (index === -1)
+        index = currentIndex;
+    switch (index) {
+        case 0: return Images.Heart;
+        case 1: return Images.Apple;
+        case 2: return Images.Dinosaur;
+        case 3: return Images.Pacman;
+        case 4: return Images.Ghost;
+        case 5: return Images.Alien;
+        case 6: return Images.Crown;
+        case 7: return Images.Stars;
+        case 8: return Images.Rainbow;
+        case 9: return Images.Black;
+        default: return Images.Black;
+    }
+}
+
+// set up messages that will be hidden in each of the pre-defined images
+const steg_msgs = [
+    "cyber",
+    "forensic expert",
+    "security analyst",
+    "ethical hacker",
+    "cyber psychologist",
+    "cyber ethics consultant",
+    "security trainer",
+    "risk assessor",
+    "threat hunter",
+    "social engineering analyst"
+];
 
 // internal function to display an image by its index number on the Zip64 leds
 function showImageIndex(imgIndex: number): void {
@@ -208,7 +287,7 @@ function recursiveDecBin(dec_num: number): string {
 }
 
 // internal wrapper function for recursiveDecBin
-// note: expected num is 0..63; returned str will be 6 bit binary
+// note: expected num bits is 6 or 8; returned str will be 6 or 8 bit binary
 function convertDecBin(dec_num: number, bits: number): string {
     if (bits === 6) {
         // only convert 0..63 (to give 6 bit binary). Otherwise return 0
@@ -251,11 +330,20 @@ function convertBinDec(bin_num: string): number {
     return result;
 }
 
-// internal function to support changeColour
-function changeColourInt(red: number, green: number, blue: number, img: Images, pixel: number): void {
+// internal function to support writeColour
+function writeColourInt(red: number, green: number, blue: number, img: Images, pixel: number): void {
     let imgIndex = findIndex(img);
     imagesArr[imgIndex][pixel] = neopixel.rgb(red, green, blue);
-    display.show()
+// display.show()
+}
+
+// internal function to support resetImage - resetting an image to its original (unencoded) form
+function resetImageInt(img: Images): void {
+    let imgIndex = findIndex(img);
+    imagesArr[imgIndex] = dc(img, origArr);
+    basic.showIcon(IconNames.No);
+    basic.pause(100);
+    basic.clearScreen();
 }
 
 // internal function to support encode
@@ -277,19 +365,38 @@ function encodeInt(letter_binary: string, img: Images, pixel: number): void {
     }
 
     // finally change the given pixel on the given image
-    changeColourInt(rgb[0], rgb[1], rgb[2], img, pixel);
+    writeColourInt(rgb[0], rgb[1], rgb[2], img, pixel);
 }
 
-// -- SHOW RGB COLOUR on MICRO:BIT --
+// -- TOP GREEN BTN: SHOW RGB COLOUR as string on MICRO:BIT --
 function showRGBcolour(): void {
     let colour = imagesArr[currentIndex][currentPixel];
     let colour_array = getRGB(colour);
-    basic.showString(currentPixel+":" + colour_array[0] + "," + colour_array[1] + "," + colour_array[2]);
+    basic.showString(colour_array[0] + "," + colour_array[1] + "," + colour_array[2]);
+    //basic.showString(currentPixel+":" + colour_array[0] + "," + colour_array[1] + "," + colour_array[2]);
 }
 
 GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Fire1, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
     showRGBcolour();
 })
+
+// -- BOTTOM GREEN BTN: SHOW 2 LSBs as BINARY string on MICRO:BIT --
+function get2LeastSig(): void {
+    let colour = imagesArr[currentIndex][currentPixel];
+    let colour_array = getRGB(colour);  // rgb array: [r, g, b]
+    let result = "";
+    for (let i=0; i<3; i++) {
+        let str = convertDecBin(colour_array[i], 8) // convert as 8 bit binary
+        let LSBs = str.slice(-2); // get 2 least significant bits
+        result = result + LSBs + ",";
+    }
+    basic.showString(result.slice(0,-1));
+}
+
+GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Fire2, GAME_ZIP64.ZIP64ButtonEvents.Click, function () {
+    get2LeastSig();
+})
+
 
 
 // --- CONTROL MOVEMENT ---
@@ -346,9 +453,32 @@ GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Up, GAME_ZIP64.ZIP64ButtonEv
 //% color="#B39EF3" weight=115
 namespace cryptsteg {
 
+    // SHOW NEXT ENCRYPTED IMAGE
+    /**
+     * showNextStegImage displays the next steganographic image
+     */
+    //% block="show next steganographic image"
+    export function showNextStegImage(): void {
+        currentIndex++;
+        currentIndex = currentIndex % imagesArr.length;
+        encode_str(steg_msgs[currentIndex], findEnum(currentIndex), 0);
+    }
+
+    // SHOW ENCRYPTED IMAGE
+    /**
+     * show a message encrypted in the given image (steganography)
+     */
+    //% block="show steganographic image $img"
+    export function showStegImg(img: Images): void {
+        currentIndex = findIndex(img);     // update currentIndex to this image
+        encode_str(steg_msgs[currentIndex], img, 0);
+    }
+
+
     // SHOW COLOUR
     /**
-     * set the specified pixel to the rgb colour provided 
+     * show the given rgb colour at the specified pixel 
+     * note: show colour doesn't write this information to the underlying image
      */
     //% block="show colour red $red|green $green|blue $blue|at pixel $pixel"
     //% pixel.min=0 pixel.max=63 v.defl=0
@@ -358,6 +488,16 @@ namespace cryptsteg {
     //% inlineInputMode=inline
     export function showColour(pixel: number, red: number, green: number, blue: number): void {
         showColourInt(pixel, red, green, blue);
+    }
+
+    // CLEAR DISPLAY
+    /**
+     * clearDisplay clears the image from the Zip64 leds
+     */
+    //% block
+    export function clearDisplay(): void {
+        display.clear();
+        display.show();
     }
 
     // SHOW NEXT IMAGE
@@ -380,16 +520,6 @@ namespace cryptsteg {
     export function showImage(img: Images): void {
         currentIndex = findIndex(img);     // update currentIndex to this image
         showImageIndex(currentIndex);
-    }
-
-    // CLEAR DISPLAY
-    /**
-     * clearDisplay clears the image from the Zip64 leds
-     */
-    //% block
-    export function clearDisplay(): void {
-        display.clear();
-        display.show();
     }
 
     // Advanced functions below here ...
@@ -416,26 +546,38 @@ namespace cryptsteg {
         showImageIndex(i);
     }
 
-   // CHANGE COLOUR (write to image)
+   // WRITE COLOUR (write to image)
     /**
-     * changeColour use the new rgb values for the given image and at the specified pixel
+     * writeColour write the new rgb values to the given image at the specified pixel
      * @param red the new value for the red component
      * @param green the new value for the green component
      * @param blue the new value for the blue component
      * @param img the image to be changed
      * @param pixel the pixel to be changed
      */
-    //% block="change colour red $red|green $green|blue $blue|on image $img|at pixel $pixel"
+    //% block="write colour red $red|green $green|blue $blue|on image $img|at pixel $pixel"
     //% advanced=true
     //% pixel.min=0 pixel.max=63 pixel.defl=0
     //% red.min=0 red.max=255 red.defl=0
     //% green.min=0 green.max=255 green.defl=0
     //% blue.min=0 blue.max=255 blue.defl=0
     //% inlineInputMode=inline
-    export function changeColour(red: number, green: number, blue: number, img: Images, pixel: number): void {
-        changeColourInt(red, green, blue, img, pixel);
+    export function writeColour(red: number, green: number, blue: number, img: Images, pixel: number): void {
+        writeColourInt(red, green, blue, img, pixel);
+        showImage(img);
     }
 
+    // RESET IMAGE
+    /**
+     * resetImage resets the image to its original form, e.g. to remove encoding
+     * @param img the image to be reset
+     */
+    //% block
+    //% advanced = true
+    export function resetImage(img: Images): void {
+        resetImageInt(img);
+        showImage(img);
+    }
 
     // ENCODE STRING
     /**
@@ -445,10 +587,10 @@ namespace cryptsteg {
      * @param pixel the pixel at which to start
      */
     //% block="encode string $str in image $img || starting at pixel $pixel"
-    //% advanced = true
     //% pixel.min=0 pixel.max=63 pixel.defl=0
     //% str.defl="abc"
     //% expandableArgumentMode="toggle"
+    //% advanced = true
     //% inlineInputMode=inline
     export function encode_str(str: string, img: Images, pixel?: number): void {
         let num = 0;
@@ -465,6 +607,7 @@ namespace cryptsteg {
             else
                 encodeInt("000000", img, pixel + i);
         }
+        showImage(img);
     }
 
     // ENCODE CHAR
@@ -475,9 +618,9 @@ namespace cryptsteg {
      * @param pixel the pixel to be changed
      */
     //% block="encode char $letter in image $img at pixel $pixel"
-    //% advanced = true
     //% pixel.min=0 pixel.max=63 pixel.defl=0
     //% letter.defl="a"
+    //% advanced = true
     //% inlineInputMode=inline
     export function encode_char(letter: string, img: Images, pixel: number): void {
         // check str is single char, get ascii and convert to 1..26 for a-z (other chars -> 0)
@@ -490,6 +633,7 @@ namespace cryptsteg {
         }
         else
             encodeInt("000000", img, pixel);
+        showImage(img);
     }
 
 }
