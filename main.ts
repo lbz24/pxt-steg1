@@ -1,4 +1,1 @@
-input.onButtonPressed(Button.A, function () {
-    cryptsteg.showStegImg(Images.Heart)
-})
-cryptsteg.showImage(Images.Heart)
+cryptsteg.showImage(Images.Apple)
