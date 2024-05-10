@@ -6,7 +6,7 @@
 
 let num_pixels = 64;
 let display = neopixel.create(DigitalPin.P0, num_pixels, NeoPixelMode.RGB)
-let scrollSpeed = 180;
+let scrollSpeed = 180;  // scroll speed for show_string
 
 // set up colours used in pre-defined images
 // note: make each colour divisble by 4 => least 2 significant bits of the binary will be zero
@@ -246,6 +246,7 @@ function showImageIndex(imgIndex: number): void {
         display.setPixelColor(i, thisImg[i]);
     }
     display.show();
+    currentPixel = 0;       // used for moving around the image
 }
 
 // internal function to return array with r,g,b components from the decimal colours
@@ -411,8 +412,6 @@ GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Fire2, GAME_ZIP64.ZIP64Butto
     get2LeastSig();
 })
 
-
-
 // --- CONTROL MOVEMENT ---
 
 function tempHighlightPixel(): void {
@@ -459,7 +458,7 @@ GAME_ZIP64.onButtonPress(GAME_ZIP64.ZIP64ButtonPins.Up, GAME_ZIP64.ZIP64ButtonEv
         tempHighlightPixel();
 })
 
-
+// --
 /**
  * Custom blocks for Cryptography - Steganography
  */
