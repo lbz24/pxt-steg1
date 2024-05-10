@@ -160,7 +160,7 @@ enum Images {
     //% block="black"
     Black
 }
-
+/*
 // allow a deep copy (dc) of the image to be created
 // note: initially (at set up) this will be called with imagesArr
 function dc(img: Images, thisArr: number[][]): number[] {
@@ -186,7 +186,7 @@ const rainbow_orig = dc(Images.Rainbow, imagesArr);
 const black_orig = dc(Images.Black, imagesArr);
 
 const origArr = [heart_orig, apple_orig, dinosaur_orig, pacman_orig, ghost_orig, alien_orig, crown_orig, stars_orig, rainbow_orig, black_orig];
-
+*/
 // internal function to find array index from the enumeration type
 // note: tried Object.values and keys but "property does not exist"
 function findIndex(img: Images): number {
@@ -338,7 +338,7 @@ function writeColourInt(red: number, green: number, blue: number, img: Images, p
     imagesArr[imgIndex][pixel] = neopixel.rgb(red, green, blue);
 // display.show()
 }
-
+/*
 // internal function to support resetImage - resetting an image to its original (unencoded) form
 function resetImageInt(img: Images): void {
     let imgIndex = findIndex(img);
@@ -361,7 +361,7 @@ function resetAllImagesInt(): void {
         basic.pause(50);
     }
 }
-
+*/
 // internal function to support encode
 function encodeInt(letter_binary: string, img: Images, pixel: number): void {
     // get rgb colour (as array) for given pixel of given image
@@ -584,25 +584,27 @@ namespace cryptsteg {
     /**
      * resetAllImages resets all images to their original form, e.g. to remove encoding
      */
-    //% block
-    //% advanced = true
+    // block
+    // advanced = true
+/*
     export function resetAllImages(): void {
         resetAllImagesInt();
         showImage(findEnum(currentIndex));
     }
-
+*/
     // RESET IMAGE
     /**
      * resetImage resets the image to its original form, e.g. to remove encoding
      * @param img the image to be reset
      */
-    //% block
-    //% advanced = true
+    // block
+    // advanced = true
+/*
     export function resetImage(img: Images): void {
         resetImageInt(img);
         showImage(img);
     }
-
+*/
     // ENCODE STRING
     /**
      * encode the string in the given image, starting at the specified pixel value
