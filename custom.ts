@@ -246,7 +246,7 @@ function showImageIndex(imgIndex: number): void {
         display.setPixelColor(i, thisImg[i]);
     }
     display.show();
-    currentPixel = 0;       // used for moving around the image
+    //currentPixel = 0;       // used for moving around the image
 }
 
 // internal function to return array with r,g,b components from the decimal colours
