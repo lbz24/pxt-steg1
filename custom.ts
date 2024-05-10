@@ -643,7 +643,7 @@ namespace cryptsteg {
      * @param img the image to be changed
      * @param pixel the pixel to be changed
      */
-    //% block="encode char $letter in image $img at pixel $pixel"
+    //% block="encode CHAR $letter in image $img at pixel $pixel"
     //% pixel.min=0 pixel.max=63 pixel.defl=0
     //% letter.defl="a"
     //% advanced = true
